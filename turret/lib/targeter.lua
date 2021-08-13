@@ -2,11 +2,11 @@ local targeter = {} -- main table
 function targeter.getZrot(x1,z1,x2,z2)
 	local x = x2-x1
 	local z = z2-z1
-	print(" x:"..x.." z:"..z)
+	--print(" x:"..x.." z:"..z)
 	local radian = math.atan2(x,-z);
-	print("radian:"..radian)
+	--print("radian:"..radian)
 	local deg = math.deg(radian)
-	print("deg:"..deg)
+	--print("deg:"..deg)
 	return deg
 end
  
