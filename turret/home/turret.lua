@@ -37,7 +37,7 @@ while true do
 		local players = entity.scanPlayers(32)
 		if(players) then
 			local player = players[1]
-			print(player.range)
+			print("range = " .. player.range)
 			target.xz = targeter.getZrot(turretRelPos.x,turretRelPos.z,player.x,player.z)
 			target.vert = targeter.getAlt(turretRelPos.x,turretRelPos.y,turretRelPos.z,player.x,player.y+player.height/2,player.z)
 		end
