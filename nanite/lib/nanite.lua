@@ -42,7 +42,7 @@ local function sendCommand(command, arg1 , arg2)
             print(command.." "..arg1.." sent to :"..nanite.address..":"..nanite.port)
         else
             m.send(nanite.address,nanite.port,nanite.protocalName,command,arg1,arg2)
-            print(command.." "..arg1.." "..arg2.." sent to :"..nanite.address..":"..nanite.port)
+            print(command.." "..string(arg1).." "..string(arg2).." sent to :"..nanite.address..":"..nanite.port)
         end
     end
 end
