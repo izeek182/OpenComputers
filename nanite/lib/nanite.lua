@@ -3,26 +3,34 @@ local component = require("component")
 local m = component.modem
 local event = require("event")
 
+local function string(obj)
+    if(obj == next) then
+        return "nil"
+    else
+        return (obj)
+    end
+end
+
 function nanite.open()
     m.open(nanite.returnPort)
     m.setStrength(3)
     m.broadcast(nanite.port,"nanomachines","setResponsePort",nanite.returnPort)
-    local mesageType , receiverAddress , senderAddress , port , distance , arg1 , arg2 , arg3 = event.pull(5,"modem_message")
-    print("message Header: "..mesageType.." "..receiverAddress.." "..senderAddress.." "..port.." "..distance)
-    print("message PayLoad"..arg1.." "..arg2.." "..arg3)
+    local mesageType,receiverAddress,senderAddress,port,distance,arg1,arg2,arg3,arg4,arg5,arg6= event.pull(5,"modem_message")
+    print("message Header: "..mesageType.." "..receiverAddress.." "..senderAddress.." "..port.." "..string(distance))
+    print("message PayLoad: "..string(arg1).." "..string(arg2).." "..string(arg3).." "..string(arg4).." "..string(arg5).." "..string(arg6))
     nanite.address = senderAddress
     print("nanite address :"..nanite.address)
     nanite.connected = true
 end
 
 local function printNetworkResponce()
-    local first, localNetworkCard, remoteAddress, port, distance, arg1,arg2,arg3,arg4,arg5,arg6 = event.pull(5,"modem_message")
-    print(first.." "..localNetworkCard.." "..remoteAddress.." "..port.." "..distance)
-    print(arg1.." "..arg2.." "..arg3.." "..arg4.." "..arg5.." "..arg6)
+    local mesageType,receiverAddress,senderAddress,port,distance, arg1,arg2,arg3,arg4,arg5,arg6 = event.pull(5,"modem_message")
+    print("message Header: "..mesageType.." "..receiverAddress.." "..senderAddress.." "..port.." "..distance)
+    print("message PayLoad: "..arg1.." "..arg2.." "..arg3.." "..arg4.." "..arg5.." "..arg6)
 end
 
 local function sendCommand(command, arg1 , arg2)
-    if(nanite.connected) then
+    if(~nanite.connected) then
        nanite.open() 
     end
     if(arg1 ==nil) then
