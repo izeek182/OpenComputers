@@ -7,10 +7,11 @@ function nanite.open()
     m.open(nanite.returnPort)
     m.setStrength(3)
     m.broadcast(nanite.port,"nanomachines","setResponsePort",nanite.returnPort)
-    local receiverAddress , senderAddress , port , distance , arg1 , arg2 , arg3 = event.pull(5,"modem_message")
-    print(receiverAddress.." "..senderAddress.." "..port.." "..distance)
-    print(arg1.." "..arg2.." "..arg3)
+    local mesageType , receiverAddress , senderAddress , port , distance , arg1 , arg2 , arg3 = event.pull(5,"modem_message")
+    print("message Header: "..mesageType.." "..receiverAddress.." "..senderAddress.." "..port.." "..distance)
+    print("message PayLoad"..arg1.." "..arg2.." "..arg3)
     nanite.address = senderAddress
+    print("nanite address :"..nanite.address)
     nanite.connected = true
 end
 
