@@ -30,7 +30,7 @@ local function printNetworkResponce()
 end
 
 local function sendCommand(command, arg1 , arg2)
-    if(~nanite.connected) then
+    if(not nanite.connected) then
        nanite.open() 
     end
     if(arg1 ==nil) then
