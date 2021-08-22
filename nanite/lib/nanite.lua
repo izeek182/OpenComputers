@@ -6,13 +6,14 @@ local event = require("event")
 function nanite.open()
     m.open(nanite.returnPort)
     m.setStrength(3)
-    local receiverAddress , senderAddress , port , distance , arg1 , arg2 , arg3 = event.pull("modem_message")
+    m.broadcast(nanite.port,"nanomachines","setResponsePort",nanite.returnPort)
+    local receiverAddress , senderAddress , port , distance , arg1 , arg2 , arg3 = event.pull("modem_message",5)
     nanite.address = senderAddress
     nanite.connected = true
 end
 
 local function printNetworkResponce()
-    local first, localNetworkCard, remoteAddress, port, distance, arg1,arg2,arg3,arg4,arg5,arg6 = event.pull("modem_message")
+    local first, localNetworkCard, remoteAddress, port, distance, arg1,arg2,arg3,arg4,arg5,arg6 = event.pull("modem_message",5)
     print(first.." "..localNetworkCard.." "..remoteAddress.." "..port.." "..distance)
     print(arg1.." "..arg2.." "..arg3.." "..arg4.." "..arg5.." "..arg6)
 end
