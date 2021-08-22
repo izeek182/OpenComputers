@@ -25,8 +25,8 @@ end
 
 local function printNetworkResponce()
     local mesageType,receiverAddress,senderAddress,port,distance, arg1,arg2,arg3,arg4,arg5,arg6 = event.pull(5,"modem_message")
-    print("message Header: "..mesageType.." "..receiverAddress.." "..senderAddress.." "..port.." "..distance)
-    print("message PayLoad: "..arg1.." "..arg2.." "..arg3.." "..arg4.." "..arg5.." "..arg6)
+    print("message Header: "..mesageType.." "..receiverAddress.." "..senderAddress.." "..port.." "..string(distance))
+    print("message PayLoad: "..string(arg1).." "..string(arg2).." "..string(arg3).." "..string(arg4).." "..string(arg5).." "..string(arg6))
 end
 
 local function sendCommand(command, arg1 , arg2)
