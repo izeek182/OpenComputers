@@ -1,4 +1,4 @@
-local nanite = {port = 1,returnPort = 123,address = "",connected = false}
+local nanite = {port = 1,returnPort = 123,address = "",connected = false,protocalName = "nanomachines"}
 local component = require("component")
 local m = component.modem
 local event = require("event")
@@ -14,7 +14,7 @@ end
 function nanite.open()
     m.open(nanite.returnPort)
     m.setStrength(3)
-    m.broadcast(nanite.port,"nanomachines","setResponsePort",nanite.returnPort)
+    m.broadcast(nanite.port,nanite.protocalName,"setResponsePort",nanite.returnPort)
     local mesageType,receiverAddress,senderAddress,port,distance,arg1,arg2,arg3,arg4,arg5,arg6= event.pull(5,"modem_message")
     print("message Header: "..mesageType.." "..receiverAddress.." "..senderAddress.." "..port.." "..string(distance))
     print("message PayLoad: "..string(arg1).." "..string(arg2).." "..string(arg3).." "..string(arg4).." "..string(arg5).." "..string(arg6))
@@ -34,14 +34,14 @@ local function sendCommand(command, arg1 , arg2)
        nanite.open() 
     end
     if(arg1 ==nil) then
-        m.send(nanite.address,nanite.port,command)
+        m.send(nanite.address,nanite.port,nanite.protocalName,command)
         print(command.." sent to :"..nanite.address..":"..nanite.port)
     else
         if(arg2==nil) then
-            m.send(nanite.address,nanite.port,command,arg1)
+            m.send(nanite.address,nanite.port,nanite.protocalName,command,arg1)
             print(command.." "..arg1.." sent to :"..nanite.address..":"..nanite.port)
         else
-            m.send(nanite.address,nanite.port,command,arg1,arg2)
+            m.send(nanite.address,nanite.port,nanite.protocalName,command,arg1,arg2)
             print(command.." "..arg1.." "..arg2.." sent to :"..nanite.address..":"..nanite.port)
         end
     end
