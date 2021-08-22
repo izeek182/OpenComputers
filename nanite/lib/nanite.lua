@@ -35,11 +35,14 @@ local function sendCommand(command, arg1 , arg2)
     end
     if(arg1 ==nil) then
         m.send(nanite.address,nanite.port,command)
+        print(command.." sent to :"..nanite.address..":"..nanite.port)
     else
         if(arg2==nil) then
             m.send(nanite.address,nanite.port,command,arg1)
+            print(command.." "..arg1.." sent to :"..nanite.address..":"..nanite.port)
         else
             m.send(nanite.address,nanite.port,command,arg1,arg2)
+            print(command.." "..arg1.." "..arg2.." sent to :"..nanite.address..":"..nanite.port)
         end
     end
 end
