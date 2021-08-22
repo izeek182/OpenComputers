@@ -7,7 +7,7 @@ local function string(obj)
     if(obj == next) then
         return "nil"
     else
-        return (obj)
+        return tostring(obj)
     end
 end
 
