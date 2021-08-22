@@ -4,7 +4,7 @@ local m = component.modem
 local event = require("event")
 
 local function string(obj)
-    if(obj == next) then
+    if(obj == nil) then
         return "nil"
     else
         return tostring(obj)
