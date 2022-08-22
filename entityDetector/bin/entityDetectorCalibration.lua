@@ -21,7 +21,7 @@ end
  
 local function getOrigin()
     print("drop origin item on block in view of atleast one detector and press return")
-    io.read()
+    local val = io.read()
     local numOfDetectors = #unknownDetectors
     local toRemove = {}
     local itemFound = false
@@ -61,7 +61,7 @@ local function findTarget()
         if(ents == false) then  
             print("Error :"..err )
         end
-        if(#ents > 0) then
+        if(#ents > 0 and ents) then
             local det = knownDetectors[i] 
             local ent = ents[1]
             target = {x = det.x+ent.x, y=det.y+ent.y, z=det.z+ent.z, name=ent.name}
@@ -84,7 +84,7 @@ local function mapDetectors()
            if(ents == false) then
               print("scan entities failed with err "..err)
            end
-           if(#ents > 0) then
+           if(#ents > 0 and ents) then
                local ent = ents[1]
                print("entity found: "..dumpTable(ent))
                if(ent.name == target.name) then 
