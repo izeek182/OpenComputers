@@ -22,8 +22,8 @@ local function getCoords(index)
         print("Enter max Z:")
         m.max.z = io.read("*n")+1
         
-        machineManager.displayAllSaved({r=0,g=0,b=1,a=alpha})
-        machineManager.showTempMachine(m,{r=1,g=0,b=0,a=alpha})
+        machineManager:displayAllSaved({r=0,g=0,b=1,a=alpha})
+        machineManager:showTempMachine(m,{r=1,g=0,b=0,a=alpha})
         print("Enter 1 if the whole machine is highlighted")
         local s = io.read("*n")
         if s > 0 then
@@ -52,5 +52,5 @@ for index in pairs(connectedMachines) do
     end
 end
 
-machineManager.displayAllSaved()
-machineManager.SaveToFile()
+machineManager:displayAllSaved()
+machineManager:SaveToFile()
