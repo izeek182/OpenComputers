@@ -50,7 +50,7 @@ end
 
 function Manager:hideAllSaved() 
     for index in pairs(self.machines) do
-        self.hideMachine(index)
+        self:hideMachine(index)
     end
 end
 
