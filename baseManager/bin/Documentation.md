@@ -30,22 +30,23 @@ Ports
 
 | Port | Description |
 | --- | ----------- |
-| 8008 | Logger Error broadcast |
-| 8007 | Logger Info Broadcast |
+| 8008 | Logger broadcast |
 | 20   | Discovery port |
 | 21   | ping port |
 | 25   | HeartBeat port |
 | 30 | Component port |
 | 35 | GLasses port |
 
+All messages are going to have a header of the following form
+| Final Destination | more maybe? |
+
 Messages Types 
 --
 
 Logger
-| Description | Port | args[1]| args[2]|
-| --- | ----------- | ---- | ---- |
-| Logger Error broadcast| 8008  | (srcClass) | (Error message) |
-| Logger Info Broadcast| 8007  | (srcClass) | (Logged message) |
+| Description |      Port   | args[1]| args[2]| args[3] |
+| ----------- | ----------- | ---- | ---- |
+| Logger Error broadcast| 8008  | (srcClass) | (Error Level) | (message) |
 
 Automatic Discovery Protocol(ADP)
 | Description | Port | args[1]|

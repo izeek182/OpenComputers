@@ -1,16 +1,15 @@
 local MyInformation = "/data/Server.data"
 local RegisteredMachines = "/data/Machines.data"
 
-local tableLoader = require("tableToFile")
-local comp = require("component")
-local event = require("event")
-local thread = require("thread")
+local net           = require("netCore")
+local tableLoader   = require("tableToFile")
+local event         = require("event")
+local thread        = require("thread")
 
 local Logger = require("logger")
-local glasses = comp.glasses
+local threads = {hb=nil}
 local savedMachines
 local server
-local modem = comp.modem
 
 local function SendAPD(localAddress, remoteAddress, port, distance, ...)
     if(arg[1] == nil) then
@@ -34,6 +33,21 @@ local function onGlassesMessage(localAddress, remoteAddress, port, distance, ...
     Logger:info("Got a glasses message from" .. remoteAddress .. " on port " .. port)
 end
 
+local function HeartBeat(localAddress, remoteAddress, port, distance, ...)
+    if (arg[1] == nil) then
+        Logger:error("malformed HB from " .. remoteAddress)
+    end
+    if (arg[1] == "heart") then -- We only respond to the heart part of heart beat
+        net.send(remoteAddress, port, "beat")
+    end
+end
+
+local function onHeartBeat(localAddress, remoteAddress, port, distance, ...)
+end
+
+local function onADP(localAddress, remoteAddress, port, distance, ...)
+end
+
 local function onMessage(eventName, localAddress, remoteAddress, port, distance, ...)
     if port==20 then
         onADP(localAddress, remoteAddress, port, distance, arg)
@@ -51,13 +65,14 @@ end
 
 local function Init()
     --  Either intilizes the server or load the server info from file.
-    Logger:init("CentralServer")
+    Logger:init("CentralServer",true)
     Logger:info("Central Server Starting")
     server = io.open(MyInformation, "r")
     if server ~= nil then
         io.close(server)
         server = tableLoader.load(MyInformation)
     else
+        Logger:info("First time initlizing Server Data")
         server = { pos = {}, KnownHosts = {}, ARProject = { en = false } }
         print("Enter Server X:")
         server.pos.x = io.read("*n")
@@ -71,6 +86,7 @@ local function Init()
     savedMachines = io.open(RegisteredMachines, "r")
     if savedMachines ~= nil then
         io.close(server)
+        Logger:info("First time initlizing Server client list")
         savedMachines = tableLoader.load(RegisteredMachines)
     else
         savedMachines = {}
@@ -84,15 +100,12 @@ local function Init()
     threads.hb = thread.create(HeartBeat)
     threads.hb:detach()
     -- RegisterEventHandlers
-    local status = event.listen("modem_message", onMessage)
-    if (~(status)) then
-        error("Failed to register listener for network data")
-    end
+
+
+    net.listen(_NetDefs.portEnum.adp,onADP)
+    net.listen(_NetDefs.portEnum.componantCmd,onADP)
+    net.listen(_NetDefs.portEnum.heartBeat,onADP)
     -- Open The used Ports
-    modem.open(20) -- Discovery port
-    modem.open(25) -- HeartBeat port
-    modem.open(30) -- Component port
-    modem.open(35) -- GLasses port
 end
 
 Init()

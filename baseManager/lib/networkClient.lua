@@ -6,7 +6,6 @@ local event = require("event")
 local thread = require("thread")
 
 local Logger = require("logger")
-local threads = { hb = nil }
 local savedMachines
 local client
 local modem = comp.modem
@@ -14,7 +13,6 @@ local modem = comp.modem
 local function onHeartBeat(localAddress, remoteAddress, port, distance, ...)
     if (arg[1] == nil) then
         Logger:error("malformed HB from " .. remoteAddress)
-        error("malformed HB from " .. remoteAddress)
     end
     if (arg[1] == "heart") then -- We only respond to the heart part of heart beat
         modem.send(remoteAddress, port, "beat")
@@ -41,8 +39,18 @@ local function validateServer()
         end
     end
     if (client.Server ~= nil) then
-        Logger:info("Missing Remote Server")
+        Logger:info("Missing Remote Server requesing a new one")
+        modem.send(client.Server, 20)
+        local _, _, from, port, _, message = event.pull(3, "modem_message")
+        if (from ~= nil) then
+            Logger:info("remote Server successfully found")
+            client.Server = from
+        else
+            Logger:error("No remote servers responed to ADP request")
+            client.Server = nil
+        end
     end
+
 end
 
 local function Init()
@@ -55,44 +63,29 @@ local function Init()
         client = tableLoader.load(MyInformation)
     else
         client = { pos = {}, Server = nil }
-        print("Enter Server X:")
+        print("Enter client X:")
         client.pos.x = io.read("*n")
-        print("Enter Server Y:")
+        print("Enter client Y:")
         client.pos.y = io.read("*n")
-        print("Enter Server Z:")
+        print("Enter client Z:")
         client.pos.z = io.read("*n")
         tableLoader.save(client, MyInformation)
     end
-
-    validateServer()
-
-
-    --  Either intilizes the savedMachines or load the savedMachines info from file.
-    savedMachines = io.open(RegisteredMachines, "r")
-    if savedMachines ~= nil then
-        io.close(server)
-        savedMachines = tableLoader.load(RegisteredMachines)
-    else
-        savedMachines = {}
-        tableLoader.save(savedMachines, RegisteredMachines)
-    end
-    -- intilizes a HeartBeat to all knownhosts
-    if (threads.hb ~= nil) then
-        threads.hb:kill()
-        threads.hb = nil
-    end
-    threads.hb = thread.create(HeartBeat)
-    threads.hb:detach()
-    -- RegisterEventHandlers
-    local status = event.listen("modem_message", onMessage)
-    if (~(status)) then
-        error("Failed to register listener for network data")
-    end
+    
     -- Open The used Ports
     modem.open(20) -- Discovery port
     modem.open(25) -- HeartBeat port
     modem.open(30) -- Component port
     modem.open(35) -- GLasses port
+
+    validateServer()
+
+    -- RegisterEventHandlers
+    local status = event.listen("modem_message", onMessage)
+    if (~(status)) then
+        error("Failed to register listener for network data")
+    end
+
 end
 
 Init()

@@ -5,6 +5,7 @@ local tableLoader = require("tableToFile")
 local comp = require("component")
 local event = require("event")
 local thread = require("thread")
+local hosts  = require("hosts")
 
 local Logger = require("logger")
 local threads = {hb = nil }
@@ -17,15 +18,9 @@ local modem = comp.modem
 local function HeartBeat()
     while true do
         for index, host in pairs(server.KnownHosts) do
-            host.receivedHB = false;
-            modem.send(index, 40, "Heart")
+            hosts.heartBeat(host)
         end
         os.sleep(10)
-        for index, host in pairs(server.KnownHosts) do
-            if ~(host.receivedHB) then
-                Logger:error("Missing HeartBeat From " .. index)
-            end
-        end
     end
 end
 
@@ -65,11 +60,11 @@ local function onGlassesMessage(localAddress, remoteAddress, port, distance, ...
 end
 
 local function onMessage(eventName, localAddress, remoteAddress, port, distance, ...)
-    if port==20 then
+    if port==_NetDefs.portEnum.adp then
         onADP(localAddress, remoteAddress, port, distance, arg)
-    elseif port==25 then
+    elseif port==_NetDefs.portEnum.heartBeat then
         onHeartBeat(localAddress, remoteAddress, port, distance, arg)
-    elseif port==30 then
+    elseif port==_NetDefs.portEnum.componantCmd then
         onCompMessage(localAddress, remoteAddress, port, distance, arg)
     elseif port==35 then
         onGlassesMessage(localAddress, remoteAddress, port, distance, arg)
