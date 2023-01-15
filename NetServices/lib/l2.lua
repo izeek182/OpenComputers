@@ -1,7 +1,8 @@
 if(_L2 == nil) then
-    require("netDefs.lua")
+    require("netDefs")
 
     local comp = require("component")
+    local computer = require("computer")
     local event = require("event")
     local thread = require("thread")
 
@@ -36,7 +37,7 @@ if(_L2 == nil) then
         local host = {
             Name = Name,
             send = function (host,dest,...)
-                _L2.send(host.Name,dest,...)
+                _L2.send(host.Name,dest,20,...)
             end,
             close = function (host)
                 _L2Vars.localHostNames[host.Name] = nil
@@ -105,12 +106,12 @@ if(_L2 == nil) then
     end
 
     local function initModems()
-        local list = component.list("modem")
+        local list = comp.list("modem")
 
         modems = {}
 
         for index, value in ipairs(list) do
-            modems[index] = component.proxy(index)
+            modems[index] = comp.proxy(index)
         end
     end
 
@@ -128,11 +129,16 @@ if(_L2 == nil) then
     end
 
     local function init()
-        Logger:init("l2Main",false)
         -- RegisterEventHandlers
         initModems()
 
         local t = thread.create(cleanRecentMessages)
+        if(t == nil) then
+            print("thread failed to create")
+        end
+        for key, value in pairs(t) do
+            
+        end
         t:detatch()
 
         local status = event.listen("modem_message", onMessage)
