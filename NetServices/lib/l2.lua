@@ -44,7 +44,7 @@ if(_L2 == nil) then
     end
 
     function _L2.createHost(Name,port,callback)
-        local host = {
+        local Lhost = {
             Name = Name,
             send = function (host,dest,...)
                 _L2.send(host.Name,dest,20,...)
@@ -57,16 +57,17 @@ if(_L2 == nil) then
             active = true
         }
         if(_L2Vars.localHostNames[Name] == nil) then
-            _L2Vars.localHostNames[Name] = {port = host}
+            _L2Vars.localHostNames[Name] = {}
+            _L2Vars.localHostNames[Name][tostring(port)] = Lhost
         else
-            if(_L2Vars.localHostNames[Name][port] == nil)then
-                _L2Vars.localHostNames[Name][port] = host                
+            if(_L2Vars.localHostNames[Name][tostring(port)] == nil)then
+                _L2Vars.localHostNames[Name][tostring(port)] = Lhost                
             else
                 print("Port:"..port.."already taken for host:"..Name.." callback fucntion not overrwitten")
-                return host
+                return Lhost
             end
         end
-        return host
+        return Lhost
     end
 
     function _L2.open(port)
@@ -99,8 +100,8 @@ if(_L2 == nil) then
             return
         end
 
-        if(_L2Vars.localHostNames[dest][port] ~= nil) then
-            if(_L2Vars.localHostNames[dest][port].cb(src,table.unpack(arg))==nil) then
+        if(_L2Vars.localHostNames[dest][tostring(port)] ~= nil) then
+            if(_L2Vars.localHostNames[dest][tostring(port)].cb(src,table.unpack(arg))==nil) then
                 return
             end
         end
