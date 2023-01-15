@@ -1,5 +1,5 @@
 if(_Net == nil) then
-    require("defs.lua")
+    require("netDefs.lua")
 
     local comp = require("component")
     local event = require("event")
@@ -7,8 +7,10 @@ if(_Net == nil) then
 
     local modem = comp.modem
     _NetVars = {
-        listeners   = {},
-        pListeners  = {}
+        hostNameTouuid  = {},   -- HostName : uuid 
+        uuidToHostName  = {},   -- uuid : HostName
+        listeners       = {},   -- listeners {Id : listener}
+        services        = {}    -- Services format {Id : {}}
     }
     _Net = {
     }
@@ -39,7 +41,7 @@ if(_Net == nil) then
     function _Net.send(...)
         modem.send(table.unpack(arg))
     end
-    
+    -- Blocking ping command
     function _Net.ping(uuid)
         _Net.send(uuid,_NetDefs.portEnum.ping,_NetDefs.START)
     end

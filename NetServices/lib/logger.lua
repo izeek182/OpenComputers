@@ -1,10 +1,13 @@
 local Logger = {
     Class = "Unintilized",
-    local_Log = true
+    local_Log = true,
+    localhost = {Name = 1}
     }
+
+
 local comp = require("component")
 local event = require("event")
-local modem = comp.modem
+local l2    = require("l2")
 local srcFilter = nil
 local levelFilter = nil
 
@@ -17,16 +20,14 @@ function Logger:init(class,local_Log)
     else
         self.local_Log = false
     end
+    self.localhost = l2.createHost(self.Class.."_Logger",nil)
 end
 
 ---Log error level data
 ---@param Message string
 function Logger:error(Message)
-
-    if(modem ~= nil) then
-        modem.broadcast(_NetDefs.portEnum.logger, self.Class,_NetDefs.loggerEnum.error,Message)
-    else
-        print(self.Class..":Error:".."modem is nil")
+    if(self.localhost.active == true) then
+        self.localhost:send("LOGGER",_NetDefs.portEnum.logger, self.Class,_NetDefs.loggerEnum.error,Message)
     end
 
     if(self.local_Log) then
@@ -38,9 +39,8 @@ end
 ---Log info level data
 ---@param Message string
 function Logger:info(Message)
-
-    if(modem ~= nil) then
-        modem.broadcast(_NetDefs.portEnum.logger, self.Class,_NetDefs.loggerEnum.info,Message)
+    if(self.localhost.active == true) then
+        self.localhost:send("LOGGER",_NetDefs.portEnum.logger, self.Class,_NetDefs.loggerEnum.info,Message)
     end
 
     if(self.local_Log) then
@@ -54,31 +54,6 @@ end
 
 function Logger.LevelFilter(filter)
     levelFilter = filter
-end
-
-
-local function onMessage(eventName, localAddress, remoteAddress, port, distance, ...)
-    --really only care about Heart beat messages here
-    if(srcFilter ~= nil) then
-        if(srcFilter ~= arg[1]) then
-            return;
-        end
-    end
-    if(levelFilter ~= nil) then
-        if(levelFilter ~= arg[2]) then
-            return;
-        end
-    end
-    print(arg[2].." : "..arg[1].." : "..arg[3])
-end
-
----print the all relevant network logging messages
-function Logger:ActivateListener()
-    modem.open(_NetDefs.portEnum.logger)
-    local status = event.listen("modem_message", onMessage)
-    if (~(status)) then
-        print("Failed to register listener for network logging")
-    end
 end
 
 return Logger
