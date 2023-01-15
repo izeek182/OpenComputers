@@ -86,15 +86,15 @@ if(_L2 == nil) then
             _L2Vars.recentMessages[SrcHostName] = {t = computer.uptime()}
             _L2Vars.recentMessages[SrcHostName][key] = true
             print("host Not found in recent list adding:"..SrcHostName)
-            return false
+            return true
         else
             if(_L2Vars.recentMessages[SrcHostName][key] == nil) then
                 _L2Vars.recentMessages[SrcHostName][key] = true
                 print("host Found, but message id not found marking it:"..key)
-                return false
+                return true
             else
                 print("Message is a repeat host:"..SrcHostName.." key:"..key)
-                return true
+                return false
             end
         end
     end
@@ -102,8 +102,9 @@ if(_L2 == nil) then
     local function l2Processing(eventName, localAddress, remoteAddress, port, distance, --l1
         header,     --l2
         payload)    -- Next Levels
+        print("Repeat Message H:"..payload.." P:"..payload)
         local dest,src,pNum,pAge = unpackHeader(header)
-        local payloadT = serial.deserialize(payload)
+        local payloadT = serial.unserialize(payload)
         local new = CheckNewMessage(src,pNum)
         if(new == false) then
             print("Repeat Message H:"..payload.." P:"..payload)

@@ -20,3 +20,4 @@ local function onMessage(src, ...)
 end
 
 local localhost = l2.createHost("LOGGER",_NetDefs.portEnum.logger,onMessage)
+while true do os.sleep() end
