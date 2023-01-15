@@ -1,8 +1,8 @@
 if(_L2 == nil) then
     require("netDefs")
-
-    local comp = require("component")
+    local component = require("component")
     local computer = require("computer")
+    local serial = require("serialization")
     local event = require("event")
     local thread = require("thread")
 
@@ -20,15 +20,26 @@ if(_L2 == nil) then
     _L2 = {
     }
 
+    local function packHeader(DestHostName,SrcHostName,PacketNum,PacketAge)
+        local header = {DestHostName,SrcHostName,PacketNum,PacketAge}
+        return serial.serialize(header)
+    end
 
-    function _L2.send(src,TargetDestitination,port,...)
+    local function unpackHeader(header)
+        local header = serial.unserialize(header)
+        return table.unpack(header)
+    end
+
+    function _L2.send(src,dest,port,...)
         _L2Vars.packetNum = _L2Vars.packetNum + 1;
-        if(_L2Vars.routingTable[TargetDestitination] == nil)then
+        local header = packHeader(dest,src,_L2Vars.packetNum,0)
+        local payload = serial.serialize({...})
+        if(_L2Vars.routingTable[dest] == nil)then
             for key, value in pairs(modems) do
-                modems[key].broadcast(port,TargetDestitination,src,_L2Vars.packetNum,table.unpack(arg))
+                modems[key].broadcast(port,header,...)
             end
         else
-            modems[_L2Vars.routingTable[TargetDestitination].modem].send(_L2Vars.routingTable[TargetDestitination].dest,port,TargetDestitination,src,_L2Vars.packetNum,table.unpack(arg))
+            modems[_L2Vars.routingTable[dest].modem].send(_L2Vars.routingTable[dest].dest,port,header,payload)
         end
     end
 
@@ -68,50 +79,51 @@ if(_L2 == nil) then
         end
     end
 
-    local function onMessage(eventName, localAddress, remoteAddress, port, distance, --l1
-        TargetDestitination,SrcHostName,packetNum, --l2
-        ...)    -- Next Levels
-
-        local new = CheckNewMessage(SrcHostName,packetNum)
+    local function l2Processing(eventName, localAddress, remoteAddress, port, distance, --l1
+        header,     --l2
+        payload)    -- Next Levels
+        local dest,src,pNum,pAge = unpackHeader(header)
+        local payloadT = serial.deserialize(payload)
+        local new = CheckNewMessage(src,pNum)
         if(new == false) then
             return
         end
 
-        if(_L2Vars.localHostNames[TargetDestitination] ~= nil) then
-            if(_L2Vars.localHostNames[TargetDestitination](SrcHostName,table.unpack(arg))==nil) then
+        if(_L2Vars.localHostNames[dest] ~= nil) then
+            if(_L2Vars.localHostNames[dest](src,table.unpack(arg))==nil) then
                 return
             end
         end
 
-        if(_L2Vars.routingTable[SrcHostName] == nil) then
-            _L2Vars.routingTable[SrcHostName] = {modem = localAddress,dest = remoteAddress}
+        if(_L2Vars.routingTable[src] == nil) then
+            _L2Vars.routingTable[src] = {modem = localAddress,dest = remoteAddress}
         else
-            if _L2Vars.routingTable[SrcHostName].modem ~= localAddress |
-            _L2Vars.routingTable[SrcHostName].modem ~= remoteAddress
+            if _L2Vars.routingTable[src].modem ~= localAddress |
+            _L2Vars.routingTable[src].modem ~= remoteAddress
             then
                 -- Add a packetAge to optimize routes?
             end
         end
+        local newHeader = packHeader(dest,src,pNum,(pAge+1))
 
-
-        if(_L2Vars.routingTable[TargetDestitination] == nil)then
+        if(_L2Vars.routingTable[dest] == nil)then
             for key, value in pairs(modems) do
                 if key ~= localAddress then
-                    modems[key].broadcast(port,TargetDestitination,SrcHostName,packetNum,table.unpack(arg))
+                    modems[key].broadcast(port,newHeader,payload)
                 end
             end
         else
-            modems[_L2Vars.routingTable[TargetDestitination].modem].send(_L2Vars.routingTable[TargetDestitination].dest,port,TargetDestitination,SrcHostName,packetNum,table.unpack(arg))
+            modems[_L2Vars.routingTable[dest].modem].send(_L2Vars.routingTable[dest].dest,port,newHeader,payload)
         end
     end
 
     local function initModems()
-        local list = comp.list("modem")
+        local list = component.list("modem")
 
         modems = {}
 
-        for index, value in ipairs(list) do
-            modems[index] = comp.proxy(index)
+        for index, value in pairs(list) do
+            modems[index] = component.proxy(index)
         end
     end
 
@@ -141,9 +153,9 @@ if(_L2 == nil) then
         end
         t:detach()
 
-        local status = event.listen("modem_message", onMessage)
-        if (~(status)) then
-            error("Failed to register listener for network data")
+        local status = event.listen("modem_message", l2Processing)
+        if (status == false) then
+            error("Failed to register listener for network data returned:"..status)
         end
     end
 
