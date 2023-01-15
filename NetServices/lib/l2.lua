@@ -83,13 +83,16 @@ if(_L2 == nil) then
     local function CheckNewMessage(SrcHostName,packetNum)
         local key = tostring(packetNum)
         if(_L2Vars.recentMessages[SrcHostName] == nil) then 
-            _L2Vars.recentMessages[SrcHostName] = {t = computer.uptime()}
-            _L2Vars.recentMessages[SrcHostName][key] = true
+            _L2Vars.recentMessages[SrcHostName] = {}
+            _L2Vars.recentMessages[SrcHostName][key].b = true
+            _L2Vars.recentMessages[SrcHostName][key].t = computer.uptime()
+            
             print("host Not found in recent list adding:"..SrcHostName)
             return true
         else
             if(_L2Vars.recentMessages[SrcHostName][key] == nil) then
-                _L2Vars.recentMessages[SrcHostName][key] = true
+                _L2Vars.recentMessages[SrcHostName][key].b = true
+                _L2Vars.recentMessages[SrcHostName][key].t = computer.uptime()
                 print("host Found, but message id not found marking it:"..key)
                 return true
             else
@@ -155,6 +158,8 @@ if(_L2 == nil) then
             for key, value in pairs(_L2Vars.recentMessages) do
                 print("Checking host:"..key)
                 for key2, value2 in pairs(_L2Vars.recentMessages[key]) do
+                    print("entry:"..key..":"..key2.."is")
+                    print(_L2Vars.recentMessages[key][key2].t)
                     print("entry:"..key..":"..key2.."is"..(os.difftime(computer.uptime(),_L2Vars.recentMessages[key][key2].t)).."seconds old")
                     if(os.difftime(computer.uptime(),_L2Vars.recentMessages[key][key2].t) > 10)then
                         print("cleaning out message from:"..key)
