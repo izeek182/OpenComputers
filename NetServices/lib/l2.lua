@@ -139,7 +139,7 @@ if(_L2 == nil) then
         for key, value in pairs(t) do
             
         end
-        t:detatch()
+        t:detach()
 
         local status = event.listen("modem_message", onMessage)
         if (~(status)) then
