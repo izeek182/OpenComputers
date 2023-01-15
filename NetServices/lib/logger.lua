@@ -5,8 +5,6 @@ local Logger = {
     }
 
 require("netDefs")
-local comp = require("component")
-local event = require("event")
 local l2    = require("l2")
 local srcFilter = nil
 local levelFilter = nil
@@ -20,14 +18,15 @@ function Logger:init(class,local_Log)
     else
         self.local_Log = false
     end
-    self.localhost = l2.createHost(self.Class.."_Logger",nil)
+    print(_NetDefs.portEnum.logger)
+    self.localhost = l2.createHost(self.Class.."_Logger",_NetDefs.portEnum.logger,nil)
 end
 
 ---Log error level data
 ---@param Message string
 function Logger:error(Message)
     if(self.localhost.active == true) then
-        self.localhost:send("LOGGER",_NetDefs.portEnum.logger, self.Class,_NetDefs.loggerEnum.error,Message)
+        self.localhost:send("LOGGER", self.Class,_NetDefs.loggerEnum.error,Message)
     end
 
     if(self.local_Log) then
@@ -40,7 +39,7 @@ end
 ---@param Message string
 function Logger:info(Message)
     if(self.localhost.active == true) then
-        self.localhost:send("LOGGER",_NetDefs.portEnum.logger, self.Class,_NetDefs.loggerEnum.info,Message)
+        self.localhost:send("LOGGER", self.Class,_NetDefs.loggerEnum.info,Message)
     end
 
     if(self.local_Log) then
