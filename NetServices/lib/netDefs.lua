@@ -2,7 +2,15 @@ if(_NetDefs == nil) then
     _NetDefs = {}
     _NetDefs.loggerEnum = {
         error = 0,
-        info  = 1
+        info  = 1,
+        toString = function(num)
+            if num == _NetDefs.loggerEnum.error then
+                return "Error"
+            end
+            if num == _NetDefs.loggerEnum.info then
+                return "Info "
+            end
+        end
     }
     _NetDefs.hbEnum = {
         live    = 0,

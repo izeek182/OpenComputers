@@ -84,6 +84,7 @@ if(_L2 == nil) then
         local key = tostring(packetNum)
         if(_L2Vars.recentMessages[SrcHostName] == nil) then 
             _L2Vars.recentMessages[SrcHostName] = {}
+            _L2Vars.recentMessages[SrcHostName][key] = {}
             _L2Vars.recentMessages[SrcHostName][key].b = true
             _L2Vars.recentMessages[SrcHostName][key].t = computer.uptime()
             
@@ -110,12 +111,12 @@ if(_L2 == nil) then
         local payloadT = serial.unserialize(payload)
         local new = CheckNewMessage(src,pNum)
         if(new == false) then
-            print("Repeat Message H:"..header.." P:"..payload)
+            -- print("Repeat Message H:"..header.." P:"..payload)
             return
         end
         print("New Message H:"..header.." P:"..payload)
         if(_L2Vars.localHostNames[dest][tostring(port)] ~= nil) then
-            if(_L2Vars.localHostNames[dest][tostring(port)].cb(src,table.unpack(arg))==nil) then
+            if(_L2Vars.localHostNames[dest][tostring(port)].cb(src,payloadT)==nil) then
                 return
             end
         end
@@ -154,15 +155,15 @@ if(_L2 == nil) then
 
     local function cleanRecentMessages()
         while true do
-            print("Checking for recentMessages that needs cleaning")
+            -- print("Checking for recentMessages that needs cleaning")
             for key, value in pairs(_L2Vars.recentMessages) do
-                print("Checking host:"..key)
+                -- print("Checking host:"..key)
                 for key2, value2 in pairs(_L2Vars.recentMessages[key]) do
-                    print("entry:"..key..":"..key2.."is")
-                    print(_L2Vars.recentMessages[key][key2].t)
-                    print("entry:"..key..":"..key2.."is"..(os.difftime(computer.uptime(),_L2Vars.recentMessages[key][key2].t)).."seconds old")
+                    -- print("entry:"..key..":"..key2)
+                    -- print(_L2Vars.recentMessages[key][key2].t)
+                    -- print("entry:"..key..":"..key2.." is "..(os.difftime(computer.uptime(),_L2Vars.recentMessages[key][key2].t)).." seconds old")
                     if(os.difftime(computer.uptime(),_L2Vars.recentMessages[key][key2].t) > 10)then
-                        print("cleaning out message from:"..key)
+                        -- print("cleaning out message from:"..key)
                         _L2Vars.recentMessages[key][key2] = nil
                     end
                 end                
