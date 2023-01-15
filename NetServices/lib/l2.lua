@@ -83,13 +83,17 @@ if(_L2 == nil) then
     local function CheckNewMessage(SrcHostName,packetNum)
         local key = tostring(packetNum)
         if(_L2Vars.recentMessages[SrcHostName] == nil) then 
-            _L2Vars.recentMessages[SrcHostName] = {packetNum = true,t = computer.uptime()}
+            _L2Vars.recentMessages[SrcHostName] = {t = computer.uptime()}
+            _L2Vars.recentMessages[SrcHostName][key] = true
+            print("host Not found in recent list adding:"..SrcHostName)
             return false
         else
             if(_L2Vars.recentMessages[SrcHostName][key] == nil) then
                 _L2Vars.recentMessages[SrcHostName][key] = true
+                print("host Found, but message id not found marking it:"..key)
                 return false
             else
+                print("Message is a repeat host:"..SrcHostName.." key:"..key)
                 return true
             end
         end
