@@ -43,27 +43,28 @@ if(_L2 == nil) then
         end
     end
 
-    function _L2.createHost(Name,port,callback)
+    function _L2.createHost(name,port,callback)
         local Lhost = {
-            Name = Name,
+            Name = name,
             send = function (host,dest,...)
-                _L2.send(host.Name,dest,20,...)
+                _L2.send(host.Name,dest,host.Port,...)
             end,
             close = function (host)
                 _L2Vars.localHostNames[host.Name] = nil
                 host.active = false;
             end,
+            Port = port,
             cb = callback,
             active = true
         }
-        if(_L2Vars.localHostNames[Name] == nil) then
-            _L2Vars.localHostNames[Name] = {}
-            _L2Vars.localHostNames[Name][tostring(port)] = Lhost
+        if(_L2Vars.localHostNames[name] == nil) then
+            _L2Vars.localHostNames[name] = {}
+            _L2Vars.localHostNames[name][tostring(port)] = Lhost
         else
-            if(_L2Vars.localHostNames[Name][tostring(port)] == nil)then
-                _L2Vars.localHostNames[Name][tostring(port)] = Lhost                
+            if(_L2Vars.localHostNames[name][tostring(port)] == nil)then
+                _L2Vars.localHostNames[name][tostring(port)] = Lhost                
             else
-                print("Port:"..port.."already taken for host:"..Name.." callback fucntion not overrwitten")
+                print("Port:"..port.."already taken for host:"..name.." callback fucntion not overrwitten")
                 return Lhost
             end
         end
