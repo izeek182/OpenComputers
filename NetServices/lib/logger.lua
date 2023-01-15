@@ -4,7 +4,7 @@ local Logger = {
     localhost = {Name = 1}
     }
 
-
+require("netDefs")
 local comp = require("component")
 local event = require("event")
 local l2    = require("l2")

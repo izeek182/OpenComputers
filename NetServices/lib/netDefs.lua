@@ -1,4 +1,4 @@
-if(_NetDefs ~= nil) then 
+if(_NetDefs == nil) then 
     _NetDefs = {}
     _NetDefs.loggerEnum = {
         error = 0,

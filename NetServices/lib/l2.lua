@@ -68,7 +68,7 @@ if(_L2 == nil) then
     end
 
     local function onMessage(eventName, localAddress, remoteAddress, port, distance, --l1
-        TargetDestitination,SrcHostName,packetNum --l2
+        TargetDestitination,SrcHostName,packetNum, --l2
         ...)    -- Next Levels
 
         local new = CheckNewMessage(SrcHostName,packetNum)
