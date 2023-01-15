@@ -102,15 +102,15 @@ if(_L2 == nil) then
     local function l2Processing(eventName, localAddress, remoteAddress, port, distance, --l1
         header,     --l2
         payload)    -- Next Levels
-        print("Repeat Message H:"..payload.." P:"..payload)
+        -- print("Message H:"..payload.." P:"..payload)
         local dest,src,pNum,pAge = unpackHeader(header)
         local payloadT = serial.unserialize(payload)
         local new = CheckNewMessage(src,pNum)
         if(new == false) then
-            print("Repeat Message H:"..payload.." P:"..payload)
+            print("Repeat Message H:"..header.." P:"..payload)
             return
         end
-        print("New Message H:"..payload.." P:"..payload)
+        print("New Message H:"..header.." P:"..payload)
         if(_L2Vars.localHostNames[dest][tostring(port)] ~= nil) then
             if(_L2Vars.localHostNames[dest][tostring(port)].cb(src,table.unpack(arg))==nil) then
                 return
@@ -153,7 +153,9 @@ if(_L2 == nil) then
         while true do
             print("Checking for recentMessages that needs cleaning")
             for key, value in pairs(_L2Vars.recentMessages) do
+                print("Checking host:"..key)
                 for key2, value2 in pairs(_L2Vars.recentMessages[key]) do
+                    print("entry:"..key..":"..key2.."is"..(os.difftime(computer.uptime(),_L2Vars.recentMessages[key][key2].t)).."seconds old")
                     if(os.difftime(computer.uptime(),_L2Vars.recentMessages[key][key2].t) > 10)then
                         print("cleaning out message from:"..key)
                         _L2Vars.recentMessages[key][key2] = nil
