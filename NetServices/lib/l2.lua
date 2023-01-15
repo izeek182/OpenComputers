@@ -36,7 +36,7 @@ if(_L2 == nil) then
         local payload = serial.serialize({...})
         if(_L2Vars.routingTable[dest] == nil)then
             for key, value in pairs(modems) do
-                modems[key].broadcast(port,header,...)
+                modems[key].broadcast(port,header,payload)
             end
         else
             modems[_L2Vars.routingTable[dest].modem].send(_L2Vars.routingTable[dest].dest,port,header,payload)
