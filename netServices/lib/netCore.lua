@@ -1,18 +1,22 @@
 if(_Net == nil) then
-    require("defs.lua")
+    require("defs")
 
     local comp = require("component")
     local event = require("event")
     local Logger = require("logger")
 
     local modem = comp.modem
+
     _NetVars = {
         listeners   = {},
-        pListeners  = {}
-    }
-    _Net = {
+        pListeners  = {},
+        localHosts  = {},
+        DNSCache    = {},
+        remoteHosts = {}
     }
 
+    _Net = {
+    }
 
     function _Net.listen(port,listener)
         if(_NetVars.pListeners[port] == nil) then
@@ -44,14 +48,11 @@ if(_Net == nil) then
         _Net.send(uuid,_NetDefs.portEnum.ping,_NetDefs.START)
     end
 
-    local function onMessage(eventName, localAddress, remoteAddress, port, distance, ...)
-        if(_NetVars.pListeners[port] ~= nil) then
-            _NetVars.pListeners[port](localAddress, remoteAddress, port, distance, arg)            
-        else
-            if(_NetVars.listeners[port]~= nil)then
-                _NetVars.listeners[port](localAddress, remoteAddress, port, distance, arg)
-            else
-                Logger:info("recived message on port:"..port.." but has no registered services on port");
+---@diagnostic disable-next-line: unused-local
+    local function onMessage(eventName, localAddress, remoteAddress, port, distance,routingMode,finalDestination, ...)
+        if(routingMode == _NetDefs.routingEnum.hostName) then
+            if(_NetVars.localHosts[finalDestination]~nil) then
+                
             end
         end
     end

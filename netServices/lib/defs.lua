@@ -9,11 +9,10 @@ if(_NetDefs ~= nil) then
         waiting = 1,
         overdue = 2
     }
-    _NetDefs.remoteEnum = {
-        server      = 0,
-        componant   = 1,
-        display     = 2,
-        terminal    = 3
+    _NetDefs.serviceEnum = {
+        adp         = 0,
+        dns         = 1,
+        logger      = 2
     }
     _NetDefs.portEnum = {
         logger          = 8008,
@@ -21,6 +20,11 @@ if(_NetDefs ~= nil) then
         ping            = 21,
         heartBeat       = 25,
         componantCmd    = 30
+    }
+    _NetDefs.routingEnum = {
+        uuid          = 420,   --not IP
+        service       = 10,    -- Used for adp,dns,possibly others
+        hostName      = 61     --Not implmented
     }
     _NetDefs.START = 0
     _NetDefs.END   = 420
